@@ -27,6 +27,7 @@ async function run() {
     const propertyCollections = database.collection('properties');
     const favouritesCollection = database.collection('favourites');
     const bookingCollection = database.collection('bookings');
+    const reviewCollection = database.collection('review');
 
     //properties api---
     app.post('/api/properties', async (req, res) => {
@@ -159,7 +160,7 @@ async function run() {
     app.post('/api/bookings', async (req, res) => {
       try {
         const bookings = req.body;
-        console.log(bookings);
+        // console.log(bookings);
 
         const exists = await bookingCollection.findOne({
           propertyId: bookings.propertyId,
@@ -199,9 +200,71 @@ async function run() {
     });
 
 
+    // reveiew api---
+    app.post('/api/review', async (req, res) => {
+      try {
+        const review = req.body;
+        // console.log("review from thr body", review);
+
+        // const exists = await reviewCollection.findOne({
+        //   email: review.email,
+        // });
+
+        // if (exists) {
+        //   return res.status(409).json({
+        //     message: "Review already exists.",
+        //   });
+        // }
+
+        const result = await reviewCollection.insertOne(review);
+        res.status(201).json(result);
+      }
+      catch (err) {
+        res.status(500).json({ message: err.message })
+      }
+    })
+
+    app.get('/api/review/:propertyId', async (req, res) => {
+      try {
+        const propertyId = req.params.propertyId;
+
+        const result = await reviewCollection.find({ propertyId }).toArray();
+        res.status(200).json(result);
+      }
+      catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
+    });
 
 
-    
+    // ============================================
+    // TENANT HISTORICAL LOGS ROUTE SYSTEM
+    // ============================================
+    // app.get('/api/history/byEmail', async (req, res) => {
+    //   try {
+    //     const email = req.query.email;
+
+    //     if (!email) {
+    //       return res.status(400).json({ message: "Lookup query parameters required." });
+    //     }
+
+    //     const bookingsCollection = client.db("staynest").collection('bookings');
+
+    //     // Looks up all historical logs for this user that are not currently active
+    //     const query = {
+    //       tenantEmail: email,
+    //       bookingStatus: { $in: ["Completed", "Cancelled", "CheckedOut", "Rejected"] }
+    //     };
+
+    //     const result = await bookingsCollection.find(query).sort({ bookingDate: -1 }).toArray();
+
+    //     res.status(200).json(result);
+    //   } catch (error) {
+    //     res.status(500).json({ message: error.message });
+    //   }
+    // });
 
 
 
@@ -217,7 +280,6 @@ async function run() {
   }
 }
 run().catch(console.dir);
-
 
 app.get('/', (req, res) => {
   res.send('Hello Diponkor vaya......!')
