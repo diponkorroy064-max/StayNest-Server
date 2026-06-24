@@ -284,4 +284,6 @@ npm start
 
 # Author
 
-Developed for StayNest – Smart Rental Property Management Platform.
+Diponkor Roy
+Student of Programming Hero (Batch-13)
+diponkorroy064@gmail.com
