@@ -26,6 +26,7 @@ async function run() {
 
     const propertyCollections = database.collection('properties');
     const favouritesCollection = database.collection('favourites');
+    const bookingCollection = database.collection('bookings');
 
     //properties api---
     app.post('/api/properties', async (req, res) => {
@@ -135,7 +136,7 @@ async function run() {
           _id: id,
         });
         console.log(result);
-        
+
         if (result.deletedCount === 0) {
           return res.status(404).json({
             message: "Favourite not found.",
@@ -154,9 +155,53 @@ async function run() {
     });
 
 
+    // booking api---
+    app.post('/api/bookings', async (req, res) => {
+      try {
+        const bookings = req.body;
+        console.log(bookings);
+
+        const exists = await bookingCollection.findOne({
+          propertyId: bookings.propertyId,
+        });
+
+        if (exists) {
+          return res.status(409).json({
+            message: "Property already exists in booking list.",
+          });
+        }
+
+        const result = await bookingCollection.insertOne(bookings);
+        res.status(201).json(result);
+      }
+      catch (err) {
+        res.status(500).json({ message: err.message })
+      }
+    })
+
+
+    app.get('/bookings/byEmail', async (req, res) => {
+      try {
+        const email = req.query.email;
+
+        if (!email) {
+          return res.status(400).json({ message: "Tenant lookup email target parameters required." });
+        }
+
+        const query = { tenantEmail: email };
+        const result = await bookingCollection.find(query).toArray();
+
+        res.status(200).json(result);
+      }
+      catch (error) {
+        res.status(500).json({ message: error.message });
+      }
+    });
 
 
 
+
+    
 
 
 
