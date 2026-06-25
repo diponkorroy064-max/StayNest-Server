@@ -29,7 +29,7 @@ async function run() {
     const bookingCollection = database.collection('bookings');
     const reviewCollection = database.collection('review');
 
-    //all properties api---
+    //all properties api------
     app.post('/api/properties', async (req, res) => {
       const properties = req.body;
       // console.log(properties);
@@ -81,6 +81,34 @@ async function run() {
         });
       }
     });
+
+    app.delete("/api/properties/:id", async(req, res) => {
+      try {
+        const { id } = req.params;
+        // console.log('id from body', id);
+
+        const query = { _id: new ObjectId(id) };
+        // console.log('query from query', query);
+
+        const result = await propertyCollections.deleteOne(query);
+
+        if (result.deletedCount === 0) {
+          return res.status(404).json({
+            message: "Property not found",
+          });
+        }
+
+        res.status(200).json({
+          message: "Property deleted successfully",
+        });
+      } catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
+    });
+
+
 
 
     // Favourites api---
