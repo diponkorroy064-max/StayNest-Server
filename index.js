@@ -209,7 +209,6 @@ async function run() {
         // const exists = await reviewCollection.findOne({
         //   email: review.email,
         // });
-
         // if (exists) {
         //   return res.status(409).json({
         //     message: "Review already exists.",
@@ -267,6 +266,25 @@ async function run() {
     // });
 
 
+    // analytics api---
+    app.get("/analytics", async(req, res) => {
+      try {
+        const email = req.query.email;
+        const properties = await propertyCollections.find({ ownerEmail: email }).toArray();
+        const propertyIds = properties.map((property) => property._id.toString());
+        console.log('peoperty ids', propertyIds);
+
+        const bookings = await bookingCollection.find({ propertyId: { $in: propertyIds } }).toArray();
+        console.log('bookins', bookings);
+
+        res.status(200).json(bookings);
+      }
+      catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
+    });
 
 
 
