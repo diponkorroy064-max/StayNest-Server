@@ -29,7 +29,7 @@ async function run() {
     const bookingCollection = database.collection('bookings');
     const reviewCollection = database.collection('review');
 
-    //properties api---
+    //all properties api---
     app.post('/api/properties', async (req, res) => {
       const properties = req.body;
       // console.log(properties);
@@ -200,6 +200,49 @@ async function run() {
     });
 
 
+    app.patch("/api/bookings/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { bookingStatus } = req.body;
+
+        if (!bookingStatus) {
+          return res.status(400).json({
+            message: "bookingStatus is required",
+          });
+        }
+
+        const result = await bookingCollection.updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+              bookingStatus,
+            },
+          }
+        );
+
+        if (result.matchedCount === 0) {
+          return res.status(404).json({
+            message: "Booking not found",
+          });
+        }
+
+        res.status(200).json({
+          message: `Booking ${bookingStatus} successfully`,
+        });
+      }
+      catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
+    });
+
+
+
+
+
+
+
     // reveiew api---
     app.post('/api/review', async (req, res) => {
       try {
@@ -238,6 +281,9 @@ async function run() {
     });
 
 
+
+
+
     // ============================================
     // TENANT HISTORICAL LOGS ROUTE SYSTEM
     // ============================================
@@ -272,10 +318,10 @@ async function run() {
         const email = req.query.email;
         const properties = await propertyCollections.find({ ownerEmail: email }).toArray();
         const propertyIds = properties.map((property) => property._id.toString());
-        console.log('peoperty ids', propertyIds);
+        // console.log('peoperty ids', propertyIds);
 
         const bookings = await bookingCollection.find({ propertyId: { $in: propertyIds } }).toArray();
-        console.log('bookins', bookings);
+        // console.log('bookins', bookings);
 
         res.status(200).json(bookings);
       }
