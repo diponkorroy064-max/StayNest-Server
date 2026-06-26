@@ -108,7 +108,33 @@ async function run() {
       }
     });
 
+    
+    app.patch("/api/properties/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        console.log('id of body request', id);
+        const updatedData = req.body;
+        console.log('updated data', updatedData);
 
+        const result = await propertyCollections.updateOne(
+          {
+            _id: new ObjectId(id),
+          },
+          {
+            $set: updatedData,
+          }
+        );
+
+        res.status(200).json({
+          message: "Property updated successfully",
+          result,
+        });
+      } catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
+    });
 
 
     // Favourites api---
