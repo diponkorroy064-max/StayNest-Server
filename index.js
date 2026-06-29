@@ -28,6 +28,8 @@ async function run() {
     const favouritesCollection = database.collection('favourites');
     const bookingCollection = database.collection('bookings');
     const reviewCollection = database.collection('review');
+    const usersCollection = database.collection('user');
+
 
     //all properties api------
     app.post('/api/properties', async (req, res) => {
@@ -108,7 +110,7 @@ async function run() {
       }
     });
 
-    
+
     app.patch("/api/properties/:id", async (req, res) => {
       try {
         const { id } = req.params;
@@ -159,7 +161,6 @@ async function run() {
         res.status(500).json({ message: err.message })
       }
     })
-
 
     app.get('/api/favourites/byEmail', async (req, res) => {
       try {
@@ -292,11 +293,6 @@ async function run() {
     });
 
 
-
-
-
-
-
     // reveiew api---
     app.post('/api/review', async (req, res) => {
       try {
@@ -335,7 +331,57 @@ async function run() {
     });
 
 
+    // users api----
+    app.get("/api/users", async (req, res) => {
+      try {
+        const users = await usersCollection.find().toArray();
 
+        res.status(200).json(users);
+      } catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
+    });
+
+    // app.patch("/api/users/:id/role", async (req, res) => {
+    //   try {
+    //     const id = req.params.id;
+    //     const { role } = req.body;
+
+    //     const result = await usersCollection.updateOne(
+    //       { _id: new ObjectId(id) },
+    //       {
+    //         $set: {
+    //           role,
+    //         },
+    //       }
+    //     );
+
+    //     res.status(200).json(result);
+    //   } catch (error) {
+    //     res.status(500).json({
+    //       message: error.message,
+    //     });
+    //   }
+    // });
+
+
+    // app.delete("/api/users/:id", async (req, res) => {
+    //   try {
+    //     const id = req.params.id;
+
+    //     const result = await usersCollection.deleteOne({
+    //       _id: new ObjectId(id),
+    //     });
+
+    //     res.status(200).json(result);
+    //   } catch (error) {
+    //     res.status(500).json({
+    //       message: error.message,
+    //     });
+    //   }
+    // });
 
 
     // ============================================
