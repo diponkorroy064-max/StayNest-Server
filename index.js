@@ -21,7 +21,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
     const database = client.db("staynest");
 
     const propertyCollections = database.collection('properties');
@@ -29,7 +29,6 @@ async function run() {
     const bookingCollection = database.collection('bookings');
     const reviewCollection = database.collection('review');
     const usersCollection = database.collection('user');
-
 
     //all properties api------
     app.post('/api/properties', async (req, res) => {
@@ -344,6 +343,55 @@ async function run() {
       }
     });
 
+
+    app.get("/users/profile", async (req, res) => {
+      try {
+        const { email } = req.query;
+
+        if (!email) {
+          return res.status(400).json({
+            message: "Email is required",
+          });
+        }
+        const user = await usersCollection.findOne({ email });
+
+        if (!user) {
+          return res.status(404).json({
+            message: "User not found",
+          });
+        }
+
+        res.send(user);
+      } catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
+    });
+
+
+    app.patch("/users/profile/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const updatedData = req.body;
+        const result = await usersCollection.updateOne(
+          {
+            _id: new ObjectId(id),
+          },
+          {
+            $set: updatedData,
+          }
+        );
+        res.send(result);
+      }
+      catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
+    });
+
+
     // app.patch("/api/users/:id/role", async (req, res) => {
     //   try {
     //     const id = req.params.id;
@@ -436,7 +484,7 @@ async function run() {
 
 
     // Send a ping to confirm a successful connection----
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   }
   finally {
