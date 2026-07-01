@@ -211,20 +211,33 @@ async function run() {
 
 
     // booking api---
+    app.get("/bookings", async (req, res) => {
+      try {
+        const bookings = await bookingCollection.find().toArray();
+
+        res.json(bookings);
+      } catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
+    });
+
+
     app.post('/api/bookings', async (req, res) => {
       try {
         const bookings = req.body;
         // console.log(bookings);
 
-        const exists = await bookingCollection.findOne({
-          propertyId: bookings.propertyId,
-        });
+        // const exists = await bookingCollection.findOne({
+        //   propertyId: bookings.propertyId,
+        // });
 
-        if (exists) {
-          return res.status(409).json({
-            message: "Property already exists in booking list.",
-          });
-        }
+        // if (exists) {
+        //   return res.status(409).json({
+        //     message: "Property already exists in booking list.",
+        //   });
+        // }
 
         const result = await bookingCollection.insertOne(bookings);
         res.status(201).json(result);
