@@ -143,15 +143,16 @@ async function run() {
       try {
         const favourites = req.body;
         // console.log(favourites);
-        const exists = await favouritesCollection.findOne({
-          propertyId: favourites.propertyId,
-        });
 
-        if (exists) {
-          return res.status(409).json({
-            message: "Property already exists in your favourites.",
-          });
-        }
+        // const exists = await favouritesCollection.findOne({
+        //   propertyId: favourites.propertyId,
+        // });
+
+        // if (exists) {
+        //   return res.status(409).json({
+        //     message: "Property already exists in your favourites.",
+        //   });
+        // }
 
         const result = await favouritesCollection.insertOne(favourites);
         res.status(201).json(result);
@@ -374,7 +375,7 @@ async function run() {
           });
         }
 
-        res.send(user);
+        res.json(user);
       } catch (error) {
         res.status(500).json({
           message: error.message,
@@ -395,7 +396,7 @@ async function run() {
             $set: updatedData,
           }
         );
-        res.send(result);
+        res.json(result);
       }
       catch (error) {
         res.status(500).json({
@@ -445,35 +446,8 @@ async function run() {
     // });
 
 
-    // ============================================
-    // TENANT HISTORICAL LOGS ROUTE SYSTEM
-    // ============================================
-    // app.get('/api/history/byEmail', async (req, res) => {
-    //   try {
-    //     const email = req.query.email;
 
-    //     if (!email) {
-    //       return res.status(400).json({ message: "Lookup query parameters required." });
-    //     }
-
-    //     const bookingsCollection = client.db("staynest").collection('bookings');
-
-    //     // Looks up all historical logs for this user that are not currently active
-    //     const query = {
-    //       tenantEmail: email,
-    //       bookingStatus: { $in: ["Completed", "Cancelled", "CheckedOut", "Rejected"] }
-    //     };
-
-    //     const result = await bookingsCollection.find(query).sort({ bookingDate: -1 }).toArray();
-
-    //     res.status(200).json(result);
-    //   } catch (error) {
-    //     res.status(500).json({ message: error.message });
-    //   }
-    // });
-
-
-    // analytics api---
+    // analytics api----
     app.get("/analytics", async(req, res) => {
       try {
         const email = req.query.email;
@@ -485,6 +459,32 @@ async function run() {
         // console.log('bookins', bookings);
 
         res.status(200).json(bookings);
+      }
+      catch (error) {
+        res.status(500).json({
+          message: error.message,
+        });
+      }
+    });
+
+
+
+    // admin api----
+    app.get("/admin/analytics", async (req, res) => {
+      try {
+        const totalUsers = await usersCollection.countDocuments();
+        const totalProperties = await propertyCollections.countDocuments();
+        const totalBookings = await bookingCollection.countDocuments();
+        const approvedProperties = await propertyCollections.countDocuments({status: "Approved"});
+        const pendingProperties = await propertyCollections.countDocuments({status: "Pending" });
+        
+        const paidBookings = await bookingCollection.find({ paymentStatus: "Paid" }).toArray();
+        const totalRevenue = paidBookings.reduce((sum, booking) => sum + Number(booking.payAmount || booking.rentAmount || 0), 0);
+
+        const recentBookings = await bookingCollection.find().sort({ bookingDate: -1 }).limit(3).toArray();
+        const recentUsers = await usersCollection.find().sort({ createdAt: 1 }).limit(3).toArray();
+
+        res.json({totalUsers, totalProperties, totalRevenue, approvedProperties, pendingProperties, recentBookings, recentUsers});
       }
       catch (error) {
         res.status(500).json({
