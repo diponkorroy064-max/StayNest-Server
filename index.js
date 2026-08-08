@@ -2,37 +2,40 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
-// Load routes AFTER dotenv
+// Load routes AFTER dotenv---
 const adminRoutes = require("./src/routes/admin");
 const ownerRoutes = require("./src/routes/owner");
 const tenantRoutes = require("./src/routes/tenant");
 const propertyRoutes = require("./src/routes/properties");
+const reviewRoutes = require("./src/routes/review");
+const favouriteRoutes = require("./src/routes/favourites");
+// const userRoutes = require("./src/routes/users");
 
-// Database
+
+// Database--
 const connectDB = require("./src/config/db");
-
 const app = express();
-
 const port = process.env.PORT || 8000;
 
-// Middleware
+// Middleware--
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Routes--
 app.use("/api/properties", propertyRoutes);
 app.use("/api/tenant", tenantRoutes);
 app.use("/api/owner", ownerRoutes);
 app.use("/api/admin", adminRoutes);
-// app.use("/api/reviews", reviewRoutes);
+app.use("/api/review", reviewRoutes);
+app.use("/api/favourites", favouriteRoutes);
 // app.use("/api/users", userRoutes);
 
-// Home
+// Home--
 app.get("/", (req, res) => {
   res.send("Hello Diponkor vaya, New StayNest server is running!");
 });
 
-// Start server
+// Start server--
 async function startServer() {
   try {
     await connectDB();
@@ -372,42 +375,6 @@ startServer();
 //     });
 
 
-//     // reveiew api---
-//     app.post('/api/review', async (req, res) => {
-//       try {
-//         const review = req.body;
-//         // console.log("review from thr body", review);
-
-//         // const exists = await reviewCollection.findOne({
-//         //   email: review.email,
-//         // });
-//         // if (exists) {
-//         //   return res.status(409).json({
-//         //     message: "Review already exists.",
-//         //   });
-//         // }
-
-//         const result = await reviewCollection.insertOne(review);
-//         res.status(201).json(result);
-//       }
-//       catch (err) {
-//         res.status(500).json({ message: err.message })
-//       }
-//     })
-
-//     app.get('/api/review/:propertyId', async (req, res) => {
-//       try {
-//         const propertyId = req.params.propertyId;
-
-//         const result = await reviewCollection.find({ propertyId }).toArray();
-//         res.status(200).json(result);
-//       }
-//       catch (error) {
-//         res.status(500).json({
-//           message: error.message,
-//         });
-//       }
-//     });
 
 
 //     // users api----
