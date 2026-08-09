@@ -4,17 +4,21 @@ const connectDB = require("../config/db");
 
 const router = express.Router();
 
-// GET all properties---
+// GET all properties in all-properties page---
 router.get("/", async (req, res) => {
     try {
         const db = await connectDB();
         const collection = db.collection("properties");
 
-        const properties = await collection.find().toArray();
+        const properties = await collection
+            .find({
+                status: "Approved",
+                bookingStatus: { $ne: "Booked" }
+            }).toArray();
 
         res.status(200).json(properties);
-
     } catch (error) {
+        console.error("Get approved properties error:", error);
         res.status(500).json({
             message: error.message,
         });
@@ -22,7 +26,7 @@ router.get("/", async (req, res) => {
 });
 
 
-// GET property by ID---
+// GET property by ID in property details page--->
 router.get("/:id", async (req, res) => {
     try {
         const db = await connectDB();
@@ -48,6 +52,5 @@ router.get("/:id", async (req, res) => {
         });
     }
 });
-
-
 module.exports = router;
+

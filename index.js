@@ -9,7 +9,7 @@ const tenantRoutes = require("./src/routes/tenant");
 const propertyRoutes = require("./src/routes/properties");
 const reviewRoutes = require("./src/routes/review");
 const favouriteRoutes = require("./src/routes/favourites");
-// const userRoutes = require("./src/routes/users");
+const userRoutes = require("./src/routes/users");
 
 
 // Database--
@@ -17,9 +17,11 @@ const connectDB = require("./src/config/db");
 const app = express();
 const port = process.env.PORT || 8000;
 
+
 // Middleware--
 app.use(cors());
 app.use(express.json());
+
 
 // Routes--
 app.use("/api/properties", propertyRoutes);
@@ -28,12 +30,14 @@ app.use("/api/owner", ownerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/review", reviewRoutes);
 app.use("/api/favourites", favouriteRoutes);
-// app.use("/api/users", userRoutes);
+app.use("/api/users", userRoutes);
+
 
 // Home--
 app.get("/", (req, res) => {
   res.send("Hello Diponkor vaya, New StayNest server is running!");
 });
+
 
 // Start server--
 async function startServer() {
@@ -281,41 +285,6 @@ startServer();
 
 
 //     // booking api---
-//     app.get("/bookings", async (req, res) => {
-//       try {
-//         const bookings = await bookingCollection.find().toArray();
-
-//         res.json(bookings);
-//       } catch (error) {
-//         res.status(500).json({
-//           message: error.message,
-//         });
-//       }
-//     });
-
-
-//     app.post('/api/bookings', async (req, res) => {
-//       try {
-//         const bookings = req.body;
-//         // console.log(bookings);
-
-//         // const exists = await bookingCollection.findOne({
-//         //   propertyId: bookings.propertyId,
-//         // });
-
-//         // if (exists) {
-//         //   return res.status(409).json({
-//         //     message: "Property already exists in booking list.",
-//         //   });
-//         // }
-
-//         const result = await bookingCollection.insertOne(bookings);
-//         res.status(201).json(result);
-//       }
-//       catch (err) {
-//         res.status(500).json({ message: err.message })
-//       }
-//     })
 
 
 //     app.get('/bookings/byEmail', async (req, res) => {
