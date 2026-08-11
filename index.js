@@ -211,29 +211,7 @@ startServer();
 //     });
 
 
-//     // Favourites api---
-//     app.post('/api/favourites', async (req, res) => {
-//       try {
-//         const favourites = req.body;
-//         // console.log(favourites);
 
-//         // const exists = await favouritesCollection.findOne({
-//         //   propertyId: favourites.propertyId,
-//         // });
-
-//         // if (exists) {
-//         //   return res.status(409).json({
-//         //     message: "Property already exists in your favourites.",
-//         //   });
-//         // }
-
-//         const result = await favouritesCollection.insertOne(favourites);
-//         res.status(201).json(result);
-//       }
-//       catch (err) {
-//         res.status(500).json({ message: err.message })
-//       }
-//     })
 
 //     app.get('/api/favourites/byEmail', async (req, res) => {
 //       try {
