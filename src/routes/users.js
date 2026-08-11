@@ -6,7 +6,6 @@ const router = express.Router();
 
 // ==========================================
 // GET SINGLE USER PROFILE BY EMAIL
-// GET /api/users/profile?email=example@gmail.com
 // ==========================================
 router.get("/profile", async (req, res) => {
     try {
@@ -45,8 +44,7 @@ router.get("/profile", async (req, res) => {
 
 
 // ==========================================
-// UPDATE USER PROFILE
-// PATCH /api/users/profile/:id
+// UPDATE USER PROFILE---
 // ==========================================
 router.patch("/profile/:id", async (req, res) => {
     try {
@@ -73,8 +71,12 @@ router.patch("/profile/:id", async (req, res) => {
             "name",
             "image",
             "phone",
-            "address",
-            "bio",
+            "nid",
+            "emergencyContact",
+            "permanentAddress",
+            "companyName",
+            "bkashNumber",
+            "bankAccountNumber",
         ];
 
         const filteredData = {};
@@ -115,8 +117,8 @@ router.patch("/profile/:id", async (req, res) => {
         res.status(200).json({
             message: "Profile updated successfully",
             user: updatedUser,
+            modifiedCount: result.modifiedCount,
         });
-
     } catch (error) {
         console.error("Update user profile error:", error);
 
@@ -126,6 +128,5 @@ router.patch("/profile/:id", async (req, res) => {
         });
     }
 });
-
 
 module.exports = router;

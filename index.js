@@ -287,65 +287,6 @@ startServer();
 //     // booking api---
 
 
-//     app.get('/bookings/byEmail', async (req, res) => {
-//       try {
-//         const email = req.query.email;
-
-//         if (!email) {
-//           return res.status(400).json({ message: "Tenant lookup email target parameters required." });
-//         }
-
-//         const query = { tenantEmail: email };
-//         const result = await bookingCollection.find(query).toArray();
-
-//         res.status(200).json(result);
-//       }
-//       catch (error) {
-//         res.status(500).json({ message: error.message });
-//       }
-//     });
-
-
-//     app.patch("/api/bookings/:id", async (req, res) => {
-//       try {
-//         const { id } = req.params;
-//         const { bookingStatus } = req.body;
-
-//         if (!bookingStatus) {
-//           return res.status(400).json({
-//             message: "bookingStatus is required",
-//           });
-//         }
-
-//         const result = await bookingCollection.updateOne(
-//           { _id: new ObjectId(id) },
-//           {
-//             $set: {
-//               bookingStatus,
-//             },
-//           }
-//         );
-
-//         if (result.matchedCount === 0) {
-//           return res.status(404).json({
-//             message: "Booking not found",
-//           });
-//         }
-
-//         res.status(200).json({
-//           message: `Booking ${bookingStatus} successfully`,
-//         });
-//       }
-//       catch (error) {
-//         res.status(500).json({
-//           message: error.message,
-//         });
-//       }
-//     });
-
-
-
-
 //     // users api----
 //     app.get("/api/users", async (req, res) => {
 //       try {
