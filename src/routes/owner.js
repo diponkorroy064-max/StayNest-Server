@@ -132,6 +132,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 
+
 // Delete property in owner dashboard--->My Property
 router.delete("/:id", async (req, res) => {
     try {
@@ -223,18 +224,6 @@ router.patch("/:id/bookingStatus", async (req, res) => {
         });
     }
 });
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

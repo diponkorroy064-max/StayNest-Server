@@ -4,7 +4,7 @@ const connectDB = require("../config/db");
 const router = express.Router();
 
 
-// GET all properties in all-properties page---
+// GET all properties in all-properties page--->
 router.get("/", async (req, res) => {
     try {
         const db = await connectDB();

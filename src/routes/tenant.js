@@ -4,52 +4,6 @@ const connectDB = require("../config/db");
 const router = express.Router();
 
 
-// ===========================================================
-// Add favourite property in tenant dashboard-->favourite
-// ===========================================================
-// router.post("/favourites", async (req, res) => {
-//     try {
-//         const db = await connectDB();
-//         const collection = db.collection("favourites");
-//         const favourite = req.body;
-
-//         const result = await collection.insertOne(favourite);
-
-//         res.status(201).json(result);
-
-//     } catch (error) {
-//         res.status(500).json({
-//             message: error.message,
-//         });
-//     }
-// });
-
-//     // Favourites api---
-//     app.post('/api/favourites', async (req, res) => {
-//       try {
-//         const favourites = req.body;
-//         // console.log(favourites);
-
-//         // const exists = await favouritesCollection.findOne({
-//         //   propertyId: favourites.propertyId,
-//         // });
-
-//         // if (exists) {
-//         //   return res.status(409).json({
-//         //     message: "Property already exists in your favourites.",
-//         //   });
-//         // }
-
-//         const result = await favouritesCollection.insertOne(favourites);
-//         res.status(201).json(result);
-//       }
-//       catch (err) {
-//         res.status(500).json({ message: err.message })
-//       }
-//     })
-
-
-
 //====================================================
 // Get favourites by email in tenant dashboard-->home
 //====================================================
@@ -112,24 +66,81 @@ router.delete("/:id", async (req, res) => {
 
 
 
-// =============================
-// Create bookings
-// =============================
+//=======================================================================
+// Create bookings by tenant in booking detail page--->Booking Modal
+//=======================================================================
 router.post("/bookings", async (req, res) => {
     try {
         const db = await connectDB();
-
-        const collection = db.collection("bookings");
-
+        const bookingCollection = db.collection("bookings");
         const booking = req.body;
+        const { propertyId, tenantEmail, moveInDate, contactNumber} = booking;
 
-        const result = await collection.insertOne(booking);
+        // Validate required fields---
+        if (!propertyId) {
+            return res.status(400).json({
+                message: "Property ID is required.",
+            });
+        }
 
-        res.status(201).json(result);
+        if (!tenantEmail) {
+            return res.status(400).json({
+                message: "Tenant email is required.",
+            });
+        }
+
+        if (!moveInDate) {
+            return res.status(400).json({
+                message: "Move-in date is required.",
+            });
+        }
+
+        if (!contactNumber) {
+            return res.status(400).json({
+                message: "Contact number is required.",
+            });
+        }
+
+        // Check existing active booking---
+        console.log("Checking property:", propertyId);
+
+        const existingBooking = await bookingCollection.findOne({
+            propertyId: propertyId,
+            bookingStatus: {
+                $in: ["Confirmed", "Active"],
+            },
+        });
+        console.log("Existing booking:", existingBooking);
+
+        // if (existingBooking) {
+        //     return res.status(409).json({
+        //         message: "This property has already been booked.",
+        //     });
+        // }
+
+        // Create booking---
+        const newBooking = {
+            ...booking,
+            payAmount: Number(booking.payAmount),
+            createdAt: new Date(),
+        };
+
+        const result = await bookingCollection.insertOne(newBooking);
+
+        return res.status(201).json({
+            message: "Booking created successfully.",
+            booking: {
+                ...newBooking,
+                _id: result.insertedId,
+            },
+        });
 
     } catch (error) {
-        res.status(500).json({
-            message: error.message,
+        console.error("Booking error:", error);
+
+        return res.status(500).json({
+            message: "Failed to create booking.",
+            error: error.message,
         });
     }
 });
@@ -186,15 +197,7 @@ router.get("/bookings", async (req, res) => {
 //         const bookings = req.body;
 //         // console.log(bookings);
 
-//         // const exists = await bookingCollection.findOne({
-//         //   propertyId: bookings.propertyId,
-//         // });
-
-//         // if (exists) {
-//         //   return res.status(409).json({
-//         //     message: "Property already exists in booking list.",
-//         //   });
-//         // }
+//         
 
 //         const result = await bookingCollection.insertOne(bookings);
 //         res.status(201).json(result);

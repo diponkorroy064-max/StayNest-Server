@@ -10,39 +10,43 @@ router.post("/", async (req, res) => {
     try {
         const db = await connectDB();
         const favouritesCollection = db.collection("favourites");
-        const favourite = req.body;
-        const { propertyId, currentUserEmail} = favourite;
+        const {propertyId, currentUserEmail} = req.body;
 
-        // Validate required fields--
+        // Validate property ID---
         if (!propertyId) {
             return res.status(400).json({
                 message: "Property ID is required.",
             });
         }
+
+        // Validate user email---
         if (!currentUserEmail) {
             return res.status(400).json({
                 message: "User email is required.",
             });
         }
 
-        // Check if property already exists for this user--
-        const existingFavourite =
-            await favouritesCollection.findOne({
-                propertyId: propertyId,
-                currentUserEmail: currentUserEmail,
-            });
+        // Check if this user already favourited this property---
+        const existingFavourite = await favouritesCollection.findOne({ propertyId, currentUserEmail});
 
         if (existingFavourite) {
-            return res.status(409).json({
-                message: "Property already exists in your favourites.",
-            });
+            return res.status(409).json({message: "You have already added this property to your favourites."});
         }
 
-        // Insert EXACT frontend object--
+        // Create favourite document---
+        const favourite = {
+            ...req.body,
+            propertyId,
+            currentUserEmail,
+            createdAt: new Date(),
+        };
+
+        // Let MongoDB generate a NEW _id---
+        delete favourite._id;
+
         const result = await favouritesCollection.insertOne(favourite);
 
-        // Response--
-        res.status(201).json({
+        return res.status(201).json({
             message: "Property added to favourites successfully.",
             favourite: {
                 ...favourite,
@@ -50,18 +54,18 @@ router.post("/", async (req, res) => {
             },
         });
 
-    }
-    catch (error) {
+    } catch (error) {
         console.error("Add favourite error:", error);
 
-        // Duplicate key protection--
+        // MongoDB unique index protection
         if (error.code === 11000) {
             return res.status(409).json({
-                message: "Property already exists in your favourites.",
+                message:
+                    "You have already added this property to your favourites.",
             });
         }
 
-        res.status(500).json({
+        return res.status(500).json({
             message: "Failed to add property to favourites.",
             error: error.message,
         });

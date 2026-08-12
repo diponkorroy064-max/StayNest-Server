@@ -12,7 +12,6 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     },
 });
-
 let database;
 
 async function connectDB() {
@@ -23,8 +22,20 @@ async function connectDB() {
         await client.connect();
         database = client.db("staynest");
 
-        console.log("MongoDB connected successfully");
+        // ==========================================
+        // Create unique index for favourites
+        // ==========================================
+        await database.collection("favourites").createIndex(
+            {
+                propertyId: 1,
+                currentUserEmail: 1,
+            },
+            {
+                unique: true,
+            }
+        );
 
+        console.log("MongoDB connected successfully");
         return database;
     }
     catch (error) {
