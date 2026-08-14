@@ -2,6 +2,7 @@ const express = require("express");
 const { ObjectId } = require("mongodb");
 const connectDB = require("../config/db");
 const router = express.Router();
+const authenticate = require("../middleware/authenticate");
 
 
 //====================================================
@@ -38,7 +39,7 @@ router.get("/favourites", async (req, res) => {
 //===========================================================
 // Remove favourite from tenant dashboard--->favourites
 //===========================================================
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticate, async (req, res) => {
     try {
         const db = await connectDB();
         const collection = db.collection("favourites");
@@ -69,7 +70,7 @@ router.delete("/:id", async (req, res) => {
 //=======================================================================
 // Create bookings by tenant in booking detail page--->Booking Modal
 //=======================================================================
-router.post("/bookings", async (req, res) => {
+router.post("/bookings", authenticate, async (req, res) => {
     try {
         const db = await connectDB();
         const bookingCollection = db.collection("bookings");
@@ -110,13 +111,7 @@ router.post("/bookings", async (req, res) => {
                 $in: ["Confirmed", "Active"],
             },
         });
-        console.log("Existing booking:", existingBooking);
-
-        // if (existingBooking) {
-        //     return res.status(409).json({
-        //         message: "This property has already been booked.",
-        //     });
-        // }
+        // console.log("Existing booking:", existingBooking);
 
         // Create booking---
         const newBooking = {
@@ -177,35 +172,5 @@ router.get("/bookings", async (req, res) => {
 });
 
 
-
-//     app.get("/bookings", async (req, res) => {
-//       try {
-//         const bookings = await bookingCollection.find().toArray();
-
-//         res.json(bookings);
-//       } catch (error) {
-//         res.status(500).json({
-//           message: error.message,
-//         });
-//       }
-//     });
-
-
-
-//     app.post('/api/bookings', async (req, res) => {
-//       try {
-//         const bookings = req.body;
-//         // console.log(bookings);
-
-//         
-
-//         const result = await bookingCollection.insertOne(bookings);
-//         res.status(201).json(result);
-//       }
-//       catch (err) {
-//         res.status(500).json({ message: err.message })
-//       }
-//     })
-
-
 module.exports = router;
+

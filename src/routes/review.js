@@ -10,7 +10,6 @@ const router = express.Router();
 router.post("/", async (req, res) => {
     try {
         const db = await connectDB();
-
         const reviewCollection = db.collection("reviews");
         const propertyCollection = db.collection("properties");
         const usersCollection = db.collection("user");

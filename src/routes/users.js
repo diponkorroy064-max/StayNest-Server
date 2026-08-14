@@ -1,8 +1,9 @@
 const express = require("express");
 const { ObjectId } = require("mongodb");
 const connectDB = require("../config/db");
-
+const authenticate = require("../middleware/authenticate");
 const router = express.Router();
+
 
 // ==========================================
 // GET SINGLE USER PROFILE BY EMAIL
@@ -44,9 +45,9 @@ router.get("/profile", async (req, res) => {
 
 
 // ==========================================
-// UPDATE USER PROFILE---
+// UPDATE USER PROFILE in Dashboard---
 // ==========================================
-router.patch("/profile/:id", async (req, res) => {
+router.patch("/profile/:id", authenticate, async (req, res) => {
     try {
         const db = await connectDB();
         const usersCollection = db.collection("user");
@@ -94,7 +95,6 @@ router.patch("/profile/:id", async (req, res) => {
         }
 
         filteredData.updatedAt = new Date();
-
         const result = await usersCollection.updateOne(
             {
                 _id: new ObjectId(id),

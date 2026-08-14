@@ -1,12 +1,13 @@
 const express = require("express");
 const connectDB = require("../config/db");
+const authenticate = require("../middleware/authenticate");
 
 const router = express.Router();
 
 // ==========================================
 // ADD PROPERTY TO FAVOURITES LIST
 // ==========================================
-router.post("/", async (req, res) => {
+router.post("/", authenticate, async (req, res) => {
     try {
         const db = await connectDB();
         const favouritesCollection = db.collection("favourites");

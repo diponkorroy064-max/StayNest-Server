@@ -1,12 +1,13 @@
 const express = require("express");
 const { ObjectId } = require("mongodb");
 const connectDB = require("../config/db");
-
+const { logger } = require("../middleware/auth.middleware");
+const authenticate = require("../middleware/authenticate");
 const router = express.Router();
 
-// ==================================================
+// ====================================================
 // ADMIN ANALYTICS IN ADMIN DASHBOARD--->dashboard
-// ==================================================
+// ====================================================
 router.get("/analytics", async (req, res) => {
     try {
         const db = await connectDB();
@@ -44,9 +45,9 @@ router.get("/analytics", async (req, res) => {
 });
 
 
-// ==============================================
-// GET ALL USERS IN ADMIN DASHBOARD ---> users
-// ==============================================
+// =================================================
+// *** GET ALL USERS IN ADMIN DASHBOARD ---> users
+// =================================================
 router.get("/users", async (req, res) => {
     try {
         const db = await connectDB();
@@ -62,10 +63,10 @@ router.get("/users", async (req, res) => {
 });
 
 
-// ================================================
+// ==================================================
 // CHANGE USER ROLE IN ADMIN DASHBOARD---> users
-// ================================================
-router.patch("/users/:id/role", async (req, res) => {
+// ==================================================
+router.patch("/users/:id/role", authenticate, async (req, res) => {
     try {
         const db = await connectDB();
         const collection = db.collection("user");
@@ -110,7 +111,7 @@ router.patch("/users/:id/role", async (req, res) => {
 // ============================================
 // DELETE USER IN ADMIN DASHBOARD--->users
 // ============================================
-router.delete("/users/:id", async (req, res) => {
+router.delete("/users/:id", authenticate, async (req, res) => {
     try {
         const db = await connectDB();
         const collection = db.collection("user");
@@ -154,10 +155,10 @@ router.get("/properties", async (req, res) => {
 });
 
 
-//==========================================================
-// UPDATE PROPERTY STATUS INADMIN DASHBOARD-->Properties
-//==========================================================
-router.patch("/properties/:id/status", async (req, res) => {
+//============================================================
+// UPDATE PROPERTY STATUS IN ADMIN DASHBOARD-->Properties
+//============================================================
+router.patch("/properties/:id/status", authenticate, async (req, res,) => {
     try {
         const db = await connectDB();
         const collection = db.collection("properties");
@@ -220,10 +221,10 @@ router.patch("/properties/:id/status", async (req, res) => {
 });
 
 
-// ===================================================
+// =====================================================
 // DELETE PROPERTY IN ADMIN DASHBOARD--->Properties
-// ===================================================
-router.delete("/properties/:id", async (req, res) => {
+// =====================================================
+router.delete("/properties/:id", authenticate, async (req, res) => {
     try {
         const db = await connectDB();
         const collection = db.collection("properties");
@@ -272,7 +273,7 @@ router.get("/bookings", async (req, res) => {
 // ================================================================
 // ADMIN - UPDATE BOOKING STATUS IN ADMIN DASHBOARD-->Bookings
 // ================================================================
-router.patch("/properties/:id/booking-status", async (req, res) => {
+router.patch("/properties/:id/booking-status", authenticate, async (req, res) => {
     try {
         const db = await connectDB();
         const propertiesCollection = db.collection("properties");
@@ -328,16 +329,6 @@ router.patch("/properties/:id/booking-status", async (req, res) => {
         });
     }
 });
-
-
-
-
-
-
-
-
-
-
 
 
 module.exports = router;
