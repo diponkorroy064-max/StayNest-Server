@@ -1,15 +1,13 @@
 const { jwtVerify, createRemoteJWKSet} = require("jose");
 const AUTH_URL = process.env.BETTER_AUTH_URL;
-console.log("AUTH_URL:", AUTH_URL);
-
-
+// console.log("AUTH_URL:", AUTH_URL);
 const JWKS = createRemoteJWKSet( new URL(`${AUTH_URL}/api/auth/jwks`));
+
 
 const authenticate = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
-        console.log("Authorization header:", authHeader);
-        
+        // console.log("Authorization header:", authHeader);
 
         if (!authHeader) {
             return res.status(401).json({
@@ -22,7 +20,6 @@ const authenticate = async (req, res, next) => {
                 message: "Invalid authorization format.",
             });
         }
-
         const token = authHeader.substring(7);
 
         if (!token) {
@@ -30,8 +27,7 @@ const authenticate = async (req, res, next) => {
                 message: "Authentication token is missing.",
             });
         }
-
-        console.log("JWT received");
+        // console.log("JWT received");
 
         const { payload } = await jwtVerify(
             token,
@@ -41,15 +37,10 @@ const authenticate = async (req, res, next) => {
                 audience: AUTH_URL,
             }
         );
-
-        console.log("JWT payload:", payload);
-
+        // console.log("JWT payload:", payload);
         req.user = payload;
-
         next();
-
     } catch (error) {
-
         console.error("JWT verification failed:");
         console.error("name:", error.name);
         console.error("message:", error.message);
