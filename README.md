@@ -4,6 +4,16 @@ Backend API for the StayNest rental property platform. This server handles prope
 
 ---
 
+# 🌐 Live Demo & Repositories
+
+**Live Link:**  
+https://staynest-vert-beta.vercel.app
+
+**Client Repository:**  
+https://github.com/diponkorroy064-max/StayNest-Client
+
+---
+
 ## 🚀 Tech Stack
 
 * Node.js
