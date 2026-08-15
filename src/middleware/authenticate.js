@@ -1,5 +1,5 @@
 const { jwtVerify, createRemoteJWKSet} = require("jose");
-const AUTH_URL = process.env.BETTER_AUTH_URI;
+const AUTH_URL = process.env.BETTER_AUTH_URL;
 // console.log("AUTH_URL:", AUTH_URL);
 // console.log("JWKS URL:",`${AUTH_URL}/api/auth/jwks`);
 
