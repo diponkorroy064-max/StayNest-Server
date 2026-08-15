@@ -1,45 +1,36 @@
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const uri = process.env.MONGODB_URL;
-
-if (!uri) {
-    throw new Error("MONGODB_URL is not defined in .env");
-}
-
-const client = new MongoClient(uri, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    },
-});
+let client;
 let database;
 
 async function connectDB() {
     if (database) {
         return database;
     }
+
+    const uri = process.env.MONGODB_URL;
+
+    if (!uri) {
+        console.error("MONGODB_URL Environment Variable is missing!");
+        throw new Error("MONGODB_URL is missing in environment variables.");
+    }
+
     try {
-        await client.connect();
+        if (!client) {
+            client = new MongoClient(uri, {
+                serverApi: {
+                    version: ServerApiVersion.v1,
+                    strict: true,
+                    deprecationErrors: true,
+                },
+            });
+            await client.connect();
+        }
+
         database = client.db("staynest");
-
-        // ==========================================
-        // Create unique index for favourites
-        // ==========================================
-        await database.collection("favourites").createIndex(
-            {
-                propertyId: 1,
-                currentUserEmail: 1,
-            },
-            {
-                unique: true,
-            }
-        );
-
         console.log("MongoDB connected successfully");
         return database;
-    }
-    catch (error) {
-        console.error("MongoDB connection failed:", error.message);
+    } catch (error) {
+        console.error("MongoDB connection error:", error.message);
         throw error;
     }
 }

@@ -1,21 +1,32 @@
 require("dotenv").config();
-const app = require("./app");
-module.exports = app;
+const app = require("./src/api/app");
 const connectDB = require("./src/config/db");
 
-const PORT = process.env.PORT || 5000;
 
-async function startServer() {
+//***DB Connection Middleware for Serverless Execution---
+app.use(async (req, res, next) => {
     try {
         await connectDB();
-
-        app.listen(PORT, () => {
-            console.log(`StayNest server running on port ${PORT}`);
-        });
+        next();
     } catch (error) {
-        console.error("Server failed:", error);
-        process.exit(1);
+        console.error("DB Connection Failure during request:", error);
+        res.status(500).json({
+            success: false,
+            message: "Database connection failed",
+        });
     }
+});
+
+
+//***Runs app.listen ONLY during Local Development---
+if (process.env.NODE_ENV !== "production") {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`StayNest server running on http://localhost:${PORT}`);
+    });
 }
 
-startServer();
+
+//***Export app module for Vercel---
+module.exports = app;
+

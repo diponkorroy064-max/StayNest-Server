@@ -1,7 +1,6 @@
 const express = require("express");
 const { ObjectId } = require("mongodb");
 const connectDB = require("../config/db");
-const { logger } = require("../middleware/auth.middleware");
 const authenticate = require("../middleware/authenticate");
 const router = express.Router();
 

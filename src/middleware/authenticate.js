@@ -1,62 +1,56 @@
-const { jwtVerify, createRemoteJWKSet} = require("jose");
-const AUTH_URL = process.env.BETTER_AUTH_URL;
-// console.log("AUTH_URL:", AUTH_URL);
-// console.log("JWKS URL:",`${AUTH_URL}/api/auth/jwks`);
+let jwtVerify, createRemoteJWKSet;
 
-const JWKS = createRemoteJWKSet( new URL(`${AUTH_URL}/api/auth/jwks`));
+const loadJose = async () => {
+    if (!jwtVerify || !createRemoteJWKSet) {
+        const jose = await import("jose");
+        jwtVerify = jose.jwtVerify;
+        createRemoteJWKSet = jose.createRemoteJWKSet;
+    }
+};
 
+let JWKS;
+
+const getJWKS = async (authUrl) => {
+    await loadJose();
+    if (!JWKS) {
+        JWKS = createRemoteJWKSet(new URL(`${authUrl}/api/auth/jwks`));
+    }
+    return JWKS;
+};
 
 const authenticate = async (req, res, next) => {
+    const AUTH_URL = process.env.BETTER_AUTH_URL || "https://staynest-vert-beta.vercel.app";
+
     try {
-        console.log("\n========== AUTHENTICATE ==========");
+        await loadJose();
+
         const authHeader = req.headers.authorization;
-        // console.log("Authorization header:", authHeader);
-        console.log("Authorization:", authHeader ? "RECEIVED" : "MISSING");
 
-        if (!authHeader) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.status(401).json({
-                message: "Authentication token is required.",
+                message: "Authentication token is required or invalid format.",
             });
         }
 
-        if (!authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({
-                message: "Invalid authorization format.",
-            });
-        }
         const token = authHeader.substring(7);
-        console.log("Token received:", !!token);
-        console.log("Token length:", token.length);
 
         if (!token) {
             return res.status(401).json({
                 message: "Authentication token is missing.",
             });
         }
-        // console.log("JWT received");
 
-        const { payload } = await jwtVerify(
-            token,
-            JWKS,
-            {
-                issuer: AUTH_URL,
-                audience: AUTH_URL,
-            }
-        );
-        // console.log("JWT payload:", payload);
+        const jwksSet = await getJWKS(AUTH_URL);
+
+        const { payload } = await jwtVerify(token, jwksSet, {
+            issuer: AUTH_URL,
+            audience: AUTH_URL,
+        });
+
         req.user = payload;
         next();
     } catch (error) {
-        console.error("JWT verification failed:");
-        console.error("name:", error.name);
-        console.error("message:", error.message);
-
-        console.error("========== JWT ERROR ==========");
-        console.error("Name:", error.name);
-        console.error("Message:", error.message);
-        console.error("Code:", error.code);
-        console.error("================================");
-
+        console.error("JWT verification failed:", error.message);
         return res.status(401).json({
             message: "Invalid or expired authentication token.",
             error: error.message,
