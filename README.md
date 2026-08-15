@@ -40,7 +40,7 @@ PORT=5000
 MONGODB_URL=your_mongodb_connection_string
 AUTH_DB_NAME=staynest
 BETTER_AUTH_SECRET=your_secret_key
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URI=http://localhost:3000
 ```
 
 ### Start Development Server

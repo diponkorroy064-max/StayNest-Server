@@ -1,6 +1,7 @@
 const express = require("express");
 const { ObjectId } = require("mongodb");
 const connectDB = require("../config/db");
+const authenticate = require("../middleware/authenticate");
 const router = express.Router();
 
 
@@ -54,9 +55,7 @@ router.get("/:id", async (req, res) => {
     try {
         const db = await connectDB();
         const collection = db.collection("properties");
-
         const { id } = req.params;
-
         const property = await collection.findOne({
             _id: new ObjectId(id),
         });

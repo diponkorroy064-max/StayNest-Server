@@ -1,13 +1,17 @@
 const { jwtVerify, createRemoteJWKSet} = require("jose");
-const AUTH_URL = process.env.BETTER_AUTH_URL;
+const AUTH_URL = process.env.BETTER_AUTH_URI;
 // console.log("AUTH_URL:", AUTH_URL);
+// console.log("JWKS URL:",`${AUTH_URL}/api/auth/jwks`);
+
 const JWKS = createRemoteJWKSet( new URL(`${AUTH_URL}/api/auth/jwks`));
 
 
 const authenticate = async (req, res, next) => {
     try {
+        console.log("\n========== AUTHENTICATE ==========");
         const authHeader = req.headers.authorization;
         // console.log("Authorization header:", authHeader);
+        console.log("Authorization:", authHeader ? "RECEIVED" : "MISSING");
 
         if (!authHeader) {
             return res.status(401).json({
@@ -21,6 +25,8 @@ const authenticate = async (req, res, next) => {
             });
         }
         const token = authHeader.substring(7);
+        console.log("Token received:", !!token);
+        console.log("Token length:", token.length);
 
         if (!token) {
             return res.status(401).json({
@@ -44,6 +50,12 @@ const authenticate = async (req, res, next) => {
         console.error("JWT verification failed:");
         console.error("name:", error.name);
         console.error("message:", error.message);
+
+        console.error("========== JWT ERROR ==========");
+        console.error("Name:", error.name);
+        console.error("Message:", error.message);
+        console.error("Code:", error.code);
+        console.error("================================");
 
         return res.status(401).json({
             message: "Invalid or expired authentication token.",
